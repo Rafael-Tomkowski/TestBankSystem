@@ -1,0 +1,34 @@
+import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.*;
+
+import br.utfpr.bankapi.validations.AvailableAccountValidation;
+import br.utfpr.bankapi.repository.AccountRepository;
+
+public class AvailableAccountValidationTest {
+
+    @InjectMocks
+    private AvailableAccountValidation availableAccountValidation;
+
+    @Mock
+    private AccountRepository accountRepository;
+
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.initMocks(this);
+    }
+
+    @Test
+    public void testAccountExists() {
+        when(accountRepository.existsById(1L)).thenReturn(true);
+        assertTrue(availableAccountValidation.check(1L));
+    }
+
+    @Test
+    public void testAccountDoesNotExist() {
+        when(accountRepository.existsById(1L)).thenReturn(false);
+        assertFalse(availableAccountValidation.check(1L));
+    }
+}

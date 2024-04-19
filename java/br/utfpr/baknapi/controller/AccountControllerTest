@@ -1,0 +1,64 @@
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+
+import br.utfpr.bankapi.controller.AccountController;
+import br.utfpr.bankapi.service.AccountService;
+
+public class AccountControllerTest {
+
+    private MockMvc mockMvc;
+
+    @InjectMocks
+    private AccountController accountController;
+
+    @Mock
+    private AccountService accountService;
+
+    @BeforeEach
+    public void setup() {
+        MockitoAnnotations.initMocks(this);
+        mockMvc = standaloneSetup(accountController).build();
+    }
+
+    @Test
+    public void testGetByNumber() throws Exception {
+        mockMvc.perform(get("/accounts/123456"))
+                .andExpect(status().isOk());
+        verify(accountService).getByNumber("123456");
+    }
+
+    @Test
+    public void testGetAll() throws Exception {
+        mockMvc.perform(get("/accounts"))
+                .andExpect(status().isOk());
+        verify(accountService).getAll();
+    }
+
+    @Test
+    public void testSave() throws Exception {
+        mockMvc.perform(post("/accounts")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"balance\":1000.0}"))
+                .andExpect(status().isOk());
+        verify(accountService).save(any());
+    }
+
+    @Test
+    public void testUpdate() throws Exception {
+        mockMvc.perform(put("/accounts/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"balance\":1500.0}"))
+                .andExpect(status().isOk());
+        verify(accountService).update(any());
+    }
+}

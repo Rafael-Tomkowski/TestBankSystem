@@ -1,0 +1,52 @@
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+
+import br.utfpr.bankapi.controller.TransactionController;
+import br.utfpr.bankapi.service.TransactionService;
+
+public class TransactionControllerTest {
+
+    private MockMvc mockMvc;
+
+    @InjectMocks
+    private TransactionController transactionController;
+
+    @Mock
+    private TransactionService transactionService;
+
+    @BeforeEach
+    public void setup() {
+        MockitoAnnotations.initMocks(this);
+        mockMvc = standaloneSetup(transactionController).build();
+    }
+
+    @Test
+    public void testWithdraw() throws Exception {
+        mockMvc.perform(post("/transactions/withdraw")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"accountId\":1,\"amount\":100.0}"))
+                .andExpect(status().isOk());
+
+        verify(transactionService).withdraw(1L, 100.0);
+    }
+
+    @Test
+    public void testTransfer() throws Exception {
+        mockMvc.perform(post("/transactions/transfer")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"fromAccountId\":1,\"toAccountId\":2,\"amount\":50.0}"))
+                .andExpect(status().isOk());
+
+        verify(transactionService).transfer(1L, 2L, 50.0);
+    }
+}
